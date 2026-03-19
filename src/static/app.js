@@ -155,6 +155,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Handle Reports section
+  const loadReportsBtn = document.getElementById("load-reports-btn");
+  const reportsContent = document.getElementById("reports-content");
+  const reportsTbody = document.getElementById("reports-tbody");
+
+  loadReportsBtn.addEventListener("click", async () => {
+    try {
+      const response = await fetch("/reports/summary");
+      const data = await response.json();
+
+      reportsTbody.innerHTML = "";
+      data.summary.forEach((row) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.activity}</td>
+          <td>${row.total_enrolled}</td>
+          <td>${row.spots_remaining}</td>
+          <td>${row.fill_rate}%</td>
+        `;
+        reportsTbody.appendChild(tr);
+      });
+
+      reportsContent.classList.remove("hidden");
+    } catch (error) {
+      console.error("Error loading reports:", error);
+    }
+  });
+
   // Initialize app
   fetchActivities();
 });
