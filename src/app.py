@@ -130,3 +130,24 @@ def unregister_from_activity(activity_name: str, email: str):
     # Remove student
     activity["participants"].remove(email)
     return {"message": f"Unregistered {email} from {activity_name}"}
+
+
+@app.get("/reports/summary")
+def get_reports_summary():
+    """Get participation analytics summary for all activities"""
+    summary = []
+    for name, details in activities.items():
+        enrolled = len(details["participants"])
+        max_p = details["max_participants"]
+        spots_remaining = max_p - enrolled
+        fill_rate = round((enrolled / max_p) * 100, 1) if max_p > 0 else 0.0
+        summary.append({
+            "activity": name,
+            "total_enrolled": enrolled,
+            "max_participants": max_p,
+            "spots_remaining": spots_remaining,
+            "fill_rate": fill_rate
+        })
+    # Sort by total enrolled descending (most popular first)
+    summary.sort(key=lambda x: x["total_enrolled"], reverse=True)
+    return {"summary": summary}
